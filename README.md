@@ -1,6 +1,4 @@
-Sometimes all you need is a little time to relax...
-
-# Izuna
+# ISugar Bot
 
 Totally not another hobby project to explore stuffs.
 

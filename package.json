@@ -1,7 +1,7 @@
 {
-    "name": "izuna",
+    "name": "sugar",
     "version": "0.0.1",
-    "description": "Nin Nin!",
+    "description": "Nyaa!",
     "main": "build/bot/index.js",
     "license": "MIT",
     "scripts": {

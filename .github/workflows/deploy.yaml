@@ -22,7 +22,7 @@ jobs:
                       docker container rm izuna-runtime
                       docker image prune -f
                       rm -rf izuna
-                      git clone https://github.com/arung-agamani/izuna.git
+                      git clone https://github.com/genshiken/sugar-bot.git
                       cd izuna
                       docker build . -t izuna:latest
                       cd ..
