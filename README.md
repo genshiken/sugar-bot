@@ -1,5 +1,6 @@
-# ISugar Bot
+# Sugar Bot
 
+![sugar box](sugarbox.png)
 Totally not another hobby project to explore stuffs.
 
 This repository contains 2 main components : A web server and a Discord bot.
