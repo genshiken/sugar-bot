@@ -1,5 +1,8 @@
 import { SapphireClient } from "@sapphire/framework";
 import type { ThreadChannel } from "discord.js";
+import { Connectors, Shoukaku } from "shoukaku";
+import { config } from "../config";
+import { setShoukakuManager } from "../lib/musicQueue";
 
 function createBotApp() {
     const client = new SapphireClient({
@@ -11,7 +14,21 @@ function createBotApp() {
             "GUILD_VOICE_STATES",
         ],
         partials: ["USER", "CHANNEL"],
-        regexPrefix: new RegExp("^sugar[,! ]", "i"),
+        regexPrefix: config.botPrefix,
+    });
+    const nodes = [
+        {
+            name: "local",
+            url: "kureya.howlingmoon.dev:14045",
+            auth: process.env["KUREYA_LAVALINK_PASSWORD"]!,
+        },
+    ];
+    const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes);
+    setShoukakuManager(manager);
+    // await manager.connect();
+    manager.on("error", (_, err) => {
+        console.error(`Shoukaku error.`);
+        console.error(err);
     });
     client.login(process.env["DISCORD_BOT_TOKEN"]);
     setTimeout(() => {
