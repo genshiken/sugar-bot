@@ -1,14 +1,14 @@
 import { Command } from "@sapphire/framework";
 import type { Message } from "discord.js";
-import musicManager, { getShoukakuManager } from "../../../lib/musicQueue";
+import musicManager from "../../../lib/musicQueue";
 // import prisma from "../../lib/prisma";
 
-export class StopMusicCommand extends Command {
+export class SkipMusicCommand extends Command {
     public constructor(context: Command.Context, options: Command.Options) {
         super(context, {
             ...options,
-            name: "stop",
-            description: "Stop playing music",
+            name: "skip",
+            description: "Skip playing music",
         });
     }
 
@@ -26,14 +26,15 @@ export class StopMusicCommand extends Command {
             await message.channel.send("No bot in voice channel. Are you okay?");
             return;
         }
-        await musicGuildInfo.player.stopTrack();
-        const shoukakuManager = getShoukakuManager();
-        if (!shoukakuManager) {
-            await message.channel.send("Music manager uninitizalied. Check your implementation, dumbass");
+        // check if there is a current playing track
+        if (musicGuildInfo.isPlaying) {
+            musicGuildInfo.player.stopTrack();
+            musicGuildInfo.isPlaying = false;
+            await message.channel.send("Skipping the current track");
+            return;
+        } else {
+            await message.channel.send("No track to skip.");
             return;
         }
-        shoukakuManager.getNode()?.leaveChannel(message.guildId!);
-        await message.channel.send("Leaving the voice channel");
-        musicManager.delete(message.guildId!);
     }
 }
