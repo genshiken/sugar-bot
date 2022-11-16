@@ -14,6 +14,7 @@ if (process.env["NODE_ENV"] === "development") {
     dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 } else {
     console.log("Application is running in production mode");
+    dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
     console.log(process.env);
 }
 
