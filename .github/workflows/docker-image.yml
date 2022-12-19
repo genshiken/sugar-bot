@@ -28,6 +28,6 @@ jobs:
         context: .
         file: Dockerfile
         push: true
-        tag: ghcr.io/genshiken/sugar-bot:latest
+        tags: ghcr.io/genshiken/sugar-bot:latest
         
         
