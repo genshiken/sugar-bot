@@ -23,13 +23,15 @@ function createBotApp() {
             auth: process.env["KUREYA_LAVALINK_PASSWORD"]!,
         },
     ];
-    const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes);
-    setShoukakuManager(manager);
-    // await manager.connect();
-    manager.on("error", (_, err) => {
-        console.error(`Shoukaku error.`);
-        console.error(err);
-    });
+    if (config.music) {
+        const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes);
+        setShoukakuManager(manager);
+        // await manager.connect();
+        manager.on("error", (_, err) => {
+            console.error(`Shoukaku error.`);
+            console.error(err);
+        });
+    }
     client.login(process.env["DISCORD_BOT_TOKEN"]);
     setTimeout(() => {
         const guild = client.guilds.cache.get("688349293970849812");

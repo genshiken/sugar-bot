@@ -1,5 +1,5 @@
 import { Args, Command } from "@sapphire/framework";
-import { Message, MessageEmbed } from "discord.js";
+import { Formatters, Message, MessageEmbed } from "discord.js";
 import prisma from "../../lib/prisma";
 import { sub, formatDistanceToNow } from "date-fns";
 
@@ -9,6 +9,55 @@ interface Response {
     response: string;
 }
 
+const foods: Response[] = [
+    {
+        name: "Donut (Common)",
+        weight: 1,
+        response:
+            "...\n..\n.\nAren't ya one cheap person. But still appreciated, ...n-nyaa.",
+    },
+    {
+        name: "Roti Yoland (Rare)",
+        weight: 2,
+        response:
+            "Now we're talking! Hey, wanna know what flavor of roti yoland that I think the best? Hehe.... ひ。み。つ！",
+    },
+    {
+        name: "Black Thunder (Rare)",
+        weight: 3,
+        response: "Wow, this is something. Sweet stuff! And crunchy! (❁´◡`❁)",
+    },
+    {
+        name: "Burger Nasi GKUB (Super Rare)",
+        weight: 5,
+        response:
+            "Hmm... Something pricey... And this small? Alright, not really my favorite because it can get messy real fast, but I do like the flavor!\n",
+    },
+    {
+        name: "Nasi Ayam Mang Otot (Super Rare)",
+        weight: 7,
+        response:
+            "Ah I remember this. Not only the fact you can do paylater mechanic with mang otot, they have various of sauces too!\nCan you guess what are my favorite combos of sauce???",
+    },
+    {
+        name: "Ayam Crisbar (Sangat Super Rare)",
+        weight: 8,
+        response:
+            "MmmhhhHH!!!!!! Gotta love how you can wareg as much as you want on these Crisbar stalls.\nHey, hey, I can handle up to 5!.... Level 5 of spiciness, I mean!\nI didn't imply something else, alright!",
+    },
+    {
+        name: "Whiskas (UWOOOOGH Rare)",
+        weight: 10,
+        response:
+            "WOOAAAAAAAHHH! ARE YOU SURE YOU'RE GIVING ME THIS, NYAA? MMMHHHHHH CAN I CALL YOU MASTER FROM NOW ON?? CAN I??!! CAN I???!!!!!!!",
+    },
+    {
+        name: "Cucumber",
+        weight: -15,
+        response: `[BETA]\nYou're trying to give me a cucumber. What does that even mean???!!\nHIISSSSSSSSSSSSSSSSSSSS--------------------\nI hate you. I HATE YOU! Don't you ever go seeing me again for the next 24 hours.`,
+    },
+];
+
 export class FeedCommand extends Command {
     public constructor(context: Command.Context, options: Command.Options) {
         super(context, {
@@ -16,56 +65,46 @@ export class FeedCommand extends Command {
             name: "feed",
             aliases: ["makan", "mangan"],
             description: "Feeds Sugar various stuff.\nAlso gacha hell, haha",
-            flags: ["history", "h"],
+            flags: ["history", "h", "l"],
         });
     }
 
     public async messageRun(message: Message, args: Args) {
-        const foods: Response[] = [
-            {
-                name: "Donut (Common)",
-                weight: 1,
-                response:
-                    "...\n..\n.\nAren't ya one cheap person. But still appreciated, ...n-nyaa.",
-            },
-            {
-                name: "Roti Yoland (Rare)",
-                weight: 2,
-                response:
-                    "Now we're talking! Hey, wanna know what flavor of roti yoland that I think the best? Hehe.... ひ。み。つ！",
-            },
-            {
-                name: "Black Thunder (Rare)",
-                weight: 3,
-                response:
-                    "Wow, this is something. Sweet stuff! And crunchy! (❁´◡`❁)",
-            },
-            {
-                name: "Burger Nasi GKUB (Super Rare)",
-                weight: 5,
-                response:
-                    "Hmm... Something pricey... And this small? Alright, not really my favorite because it can get messy real fast, but I do like the flavor!\n",
-            },
-            {
-                name: "Nasi Ayam Mang Otot (Super Rare)",
-                weight: 7,
-                response:
-                    "Ah I remember this. Not only the fact you can do paylater mechanic with mang otot, they have various of sauces too!\nCan you guess what are my favorite combos of sauce???",
-            },
-            {
-                name: "Ayam Crisbar (Sangat Super Rare)",
-                weight: 8,
-                response:
-                    "MmmhhhHH!!!!!! Gotta love how you can wareg as much as you want on these Crisbar stalls.\nHey, hey, I can handle up to 5!.... Level 5 of spiciness, I mean!\nI didn't imply something else, alright!",
-            },
-            {
-                name: "Whiskas (UWOOOOGH Rare)",
-                weight: 10,
-                response:
-                    "WOOAAAAAAAHHH! ARE YOU SURE YOU'RE GIVING ME THIS, NYAA? MMMHHHHHH CAN I CALL YOU MASTER FROM NOW ON?? CAN I??!! CAN I???!!!!!!!",
-            },
-        ];
         const isRequestingHistory = args.getFlags("history", "h");
+        const isRequestingLeaderboard = args.getFlags("l");
+        if (isRequestingLeaderboard) {
+            if (!message.guild) {
+                await message.channel.send(
+                    "Can't do this command outside the server, nyaa"
+                );
+                return;
+            }
+            const leaderboard = await prisma.feedRecord.groupBy({
+                by: ["from"],
+                _sum: {
+                    amount: true,
+                },
+                orderBy: {
+                    _sum: {
+                        amount: "desc",
+                    },
+                },
+            });
+            const embed = new MessageEmbed();
+            embed.setTitle("Sugar Leaderboard");
+            let msg = "";
+            let i = 0;
+            for (const item of leaderboard.slice(0, 10)) {
+                msg += `${i + 1}. ${Formatters.userMention(item.from)} - ${
+                    item._sum.amount
+                }\n`;
+                i++;
+            }
+            embed.setDescription(msg);
+            await message.channel.send({ embeds: [embed] });
+            return;
+        }
+
         if (isRequestingHistory) {
             if (!message.guild) {
                 await message.channel.send(

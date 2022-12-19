@@ -5,6 +5,7 @@ export const config = {
         process.env["NODE_ENV"] === "development"
             ? new RegExp("^sdev[,! ]", "i")
             : new RegExp("^sugar[,! ]", "i"),
+    music: process.env["MUSIC"] === "false" ? false : true, // by default will enable music feature
 };
 
 if (process.env["NODE_ENV"] === "development") {
