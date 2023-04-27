@@ -13,7 +13,7 @@ export class InfoCommand extends Command {
     }
 
     public async messageRun(message: Message) {
-        const user = await prisma.user.findFirst({
+        const user = await prisma.users.findFirst({
             where: {
                 uid: message.author.id,
             },
@@ -35,15 +35,15 @@ export class InfoCommand extends Command {
                 `Sugar: "who are you?"`
             );
         } else {
-            const totalUserScore = await prisma.feedRecord.aggregate({
+            const totalUserScore = await prisma.feedrecord.aggregate({
                 _sum: {
                     amount: true,
                 },
                 where: {
-                    from: message.author.id,
+                    uid: message.author.id,
                 },
             });
-            const totalScore = await prisma.feedRecord.aggregate({
+            const totalScore = await prisma.feedrecord.aggregate({
                 _sum: {
                     amount: true,
                 },

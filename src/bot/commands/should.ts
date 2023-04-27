@@ -24,15 +24,15 @@ export class ShouldCommand extends Command {
     }
 
     public async messageRun(message: Message) {
-        const userScore = await prisma.feedRecord.aggregate({
+        const userScore = await prisma.feedrecord.aggregate({
             _sum: {
                 amount: true,
             },
             where: {
-                from: message.author.id,
+                uid: message.author.id,
             },
         });
-        const totalScore = await prisma.feedRecord.aggregate({
+        const totalScore = await prisma.feedrecord.aggregate({
             _sum: {
                 amount: true,
             },
@@ -44,13 +44,13 @@ export class ShouldCommand extends Command {
         const positiveAnswers = ["Yes", "Yes!", "YESSS!!!"];
         const ssrAnswer =
             "Of course yes, master. Anything you think the best I also think the best";
-        const whiskasRecently = await prisma.feedRecord.findFirst({
+        const whiskasRecently = await prisma.feedrecord.findFirst({
             where: {
                 amount: 10,
                 date: {
                     gt: sub(new Date(), { hours: 3 }),
                 },
-                from: message.author.id,
+                uid: message.author.id,
             },
         });
         const af_score = activationFunction(

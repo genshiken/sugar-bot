@@ -24,11 +24,11 @@ export class RkgkCommand extends Command {
                 );
                 return;
             }
-            const discordUser = await prisma.user.findUnique({
+            const discordUser = await prisma.users.findFirst({
                 where: { uid: message.author.id },
             });
             if (!discordUser) {
-                await prisma.user.create({
+                await prisma.users.create({
                     data: {
                         uid: message.author.id,
                         name: message.author.username,
@@ -36,7 +36,7 @@ export class RkgkCommand extends Command {
                 });
                 await message.channel.send("User created...");
             }
-            const userApiKey = await prisma.danbooruUser.findUnique({
+            const userApiKey = await prisma.danbooruusers.findFirst({
                 where: { discord_uid: message.author.id },
             });
             if (userApiKey) {
@@ -45,7 +45,7 @@ export class RkgkCommand extends Command {
             }
             const username = await args.pick("string");
             const apikey = await args.pick("string");
-            await prisma.danbooruUser.create({
+            await prisma.danbooruusers.create({
                 data: {
                     discord_uid: message.author.id,
                     api_key: apikey,
@@ -57,11 +57,11 @@ export class RkgkCommand extends Command {
             );
             return;
         } else if (mode === "upload") {
-            const discordUser = await prisma.user.findUnique({
+            const discordUser = await prisma.users.findFirst({
                 where: { uid: message.author.id },
             });
             if (!discordUser) {
-                await prisma.user.create({
+                await prisma.users.create({
                     data: {
                         uid: message.author.id,
                         name: message.author.username,
@@ -69,7 +69,7 @@ export class RkgkCommand extends Command {
                 });
                 await message.channel.send("User created...");
             }
-            let userApiKey = await prisma.danbooruUser.findUnique({
+            let userApiKey = await prisma.danbooruusers.findFirst({
                 where: { discord_uid: message.author.id },
             });
             if (!userApiKey) {
@@ -77,7 +77,7 @@ export class RkgkCommand extends Command {
                     "You haven't registered API key. Sugar will use her account to upload this."
                 );
                 userApiKey = {
-                    id: -1,
+                    id: "-1",
                     discord_uid: "",
                     username: "sugar_serviceaccount",
                     api_key: process.env["SUGARBOORU_API_KEY"]!,

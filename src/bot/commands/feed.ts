@@ -79,8 +79,8 @@ export class FeedCommand extends Command {
                 );
                 return;
             }
-            const leaderboard = await prisma.feedRecord.groupBy({
-                by: ["from"],
+            const leaderboard = await prisma.feedrecord.groupBy({
+                by: ["uid"],
                 _sum: {
                     amount: true,
                 },
@@ -95,7 +95,7 @@ export class FeedCommand extends Command {
             let msg = "";
             let i = 0;
             for (const item of leaderboard.slice(0, 10)) {
-                msg += `${i + 1}. ${Formatters.userMention(item.from)} - ${
+                msg += `${i + 1}. ${Formatters.userMention(item.uid)} - ${
                     item._sum.amount
                 }\n`;
                 i++;
@@ -112,9 +112,9 @@ export class FeedCommand extends Command {
                 );
                 return;
             }
-            const feedHistory = await prisma.feedRecord.findMany({
+            const feedHistory = await prisma.feedrecord.findMany({
                 where: {
-                    from: message.author.id,
+                    uid: message.author.id,
                 },
                 orderBy: {
                     date: "desc",
@@ -164,22 +164,22 @@ export class FeedCommand extends Command {
         const rngIndex = gachaFunction() || 0;
         const rngChoice = foods[rngIndex]?.name;
         const rngWeight = foods[rngIndex]?.weight;
-        let user = await prisma.user.findUnique({
+        let user = await prisma.users.findFirst({
             where: {
                 uid: message.author.id,
             },
         });
         if (!user) {
-            user = await prisma.user.create({
+            user = await prisma.users.create({
                 data: {
                     uid: message.author.id,
                     name: message.author.username,
                 },
             });
         }
-        const recordOfRecentFeed = await prisma.feedRecord.findFirst({
+        const recordOfRecentFeed = await prisma.feedrecord.findFirst({
             where: {
-                from: message.author.id,
+                uid: message.author.id,
                 date: {
                     gt: sub(new Date(), { hours: 3 }),
                 },
@@ -192,9 +192,9 @@ export class FeedCommand extends Command {
             );
             return;
         }
-        const recordOfZonkFeed = await prisma.feedRecord.findFirst({
+        const recordOfZonkFeed = await prisma.feedrecord.findFirst({
             where: {
-                from: message.author.id,
+                uid: message.author.id,
                 amount: -15,
                 date: {
                     gt: sub(new Date(), { hours: 24 }),
@@ -208,9 +208,9 @@ export class FeedCommand extends Command {
             return;
         }
         if (Math.random() > 0.99675) {
-            await prisma.feedRecord.create({
+            await prisma.feedrecord.create({
                 data: {
-                    from: message.author.id,
+                    uid: message.author.id,
                     amount: -15,
                     date: new Date(),
                 },
@@ -220,9 +220,9 @@ export class FeedCommand extends Command {
             );
             return;
         }
-        await prisma.feedRecord.create({
+        await prisma.feedrecord.create({
             data: {
-                from: message.author.id,
+                uid: message.author.id,
                 amount: rngWeight!,
                 date: new Date(),
             },
