@@ -136,3 +136,4 @@ build
 
 test.js
 Dockerfile.test
+docker-compose.yaml

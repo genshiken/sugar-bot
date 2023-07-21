@@ -25,4 +25,6 @@ model users {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   uid  String
+  powerup String[]
+  active_powerup String?
 }

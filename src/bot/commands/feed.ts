@@ -2,6 +2,7 @@ import { Args, Command } from "@sapphire/framework";
 import { Formatters, Message, MessageEmbed } from "discord.js";
 import prisma from "../../lib/prisma";
 import { sub, formatDistanceToNow } from "date-fns";
+import { config } from "../../config";
 
 interface Response {
     name: string;
@@ -26,6 +27,12 @@ const foods: Response[] = [
         name: "Black Thunder (Rare)",
         weight: 3,
         response: "Wow, this is something. Sweet stuff! And crunchy! (❁´◡`❁)",
+    },
+    {
+        name: "Kratingd**ng (Super Rare)",
+        weight: 4,
+        response:
+            "This looks like p*ss...What is this, {{NICKNAME}}-kun?\nHmm? Health Supplement? It will turn me on for a brief moment?! Give me, nya!",
     },
     {
         name: "Burger Nasi GKUB (Super Rare)",
@@ -54,7 +61,7 @@ const foods: Response[] = [
     {
         name: "Cucumber",
         weight: -15,
-        response: `[BETA]\nYou're trying to give me a cucumber. What does that even mean???!!\nHIISSSSSSSSSSSSSSSSSSSS--------------------\nI hate you. I HATE YOU! Don't you ever go seeing me again for the next 24 hours.`,
+        response: `You're trying to give me a cucumber. What does that even mean???!!\nHIISSSSSSSSSSSSSSSSSSSS--------------------\nI hate you. I HATE YOU! Don't you ever go seeing me again for the next 24 hours.`,
     },
 ];
 
@@ -150,20 +157,20 @@ export class FeedCommand extends Command {
                 return idx[Math.floor(Math.random() * idx.length)]!;
             } else if (rng > 0.06) {
                 // Super Rare
-                const idx = [3, 4];
+                const idx = [3, 4, 5];
                 return idx[Math.floor(Math.random() * idx.length)]!;
             } else if (rng > 0.03) {
                 // Sangat Super Rare
-                const idx = [5];
+                const idx = [6];
                 return idx[Math.floor(Math.random() * idx.length)]!;
             } else {
                 // UWOOOOOGH Rare
-                return 6;
+                return 7;
             }
         };
         const rngIndex = gachaFunction() || 0;
-        const rngChoice = foods[rngIndex]?.name;
-        const rngWeight = foods[rngIndex]?.weight;
+        const rngChoice = foods[rngIndex]!.name;
+        const rngWeight = foods[rngIndex]!.weight;
         let user = await prisma.users.findFirst({
             where: {
                 uid: message.author.id,
@@ -174,6 +181,8 @@ export class FeedCommand extends Command {
                 data: {
                     uid: message.author.id,
                     name: message.author.username,
+                    active_powerup: "",
+                    powerup: [],
                 },
             });
         }
@@ -185,7 +194,17 @@ export class FeedCommand extends Command {
                 },
             },
         });
-        if (recordOfRecentFeed) {
+        if (user.active_powerup === "kratingdaeng") {
+            // use kratingdaeng, update active to empty
+            await prisma.users.updateMany({
+                where: {
+                    uid: message.author.id,
+                },
+                data: {
+                    active_powerup: "",
+                },
+            });
+        } else if (recordOfRecentFeed) {
             const deltaTime = formatDistanceToNow(recordOfRecentFeed.date);
             await message.channel.send(
                 `You've feed me ${deltaTime} ago, nyaa. Let me sleep, nyaw...`
@@ -216,7 +235,7 @@ export class FeedCommand extends Command {
                 },
             });
             await message.channel.send(
-                `[BETA]\nYou're trying to give me a cucumber. What does that even mean???!!\nHIISSSSSSSSSSSSSSSSSSSS--------------------\nI hate you. I HATE YOU! Don't you ever go seeing me again for the next 24 hours.`
+                `You're trying to give me a cucumber. What does that even mean???!!\nHIISSSSSSSSSSSSSSSSSSSS--------------------\nI hate you. I HATE YOU! Don't you ever go seeing me again for the next 24 hours.`
             );
             return;
         }
@@ -227,8 +246,26 @@ export class FeedCommand extends Command {
                 date: new Date(),
             },
         });
+        if (rngChoice === "Kratingd**ng (Super Rare)") {
+            await prisma.users.updateMany({
+                where: {
+                    uid: message.author.id,
+                },
+                data: {
+                    powerup: {
+                        push: "kratingdaeng",
+                    },
+                },
+            });
+        }
+        const nickname = (await message.guild!.members.fetch(message.author.id))
+            .displayName;
+        let response = foods[rngIndex]?.response;
+        response = response?.replaceAll("{{NICKNAME}}", nickname);
         await message.channel.send(
-            `[BETA]\nYou've fed me ${rngChoice}!\n${foods[rngIndex]?.response}`
+            `${
+                config.isDev ? "[DEVELOPMENT]\n" : ""
+            }You've fed me ${rngChoice}!\n${response}`
         );
     }
 }

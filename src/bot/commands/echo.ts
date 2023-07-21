@@ -12,7 +12,8 @@ export class EchoCommand extends Command {
     }
 
     public async messageRun(message: Message, args: Args) {
-        const msg = await args.rest("string")
+        const msg = await args.rest("string");
+        await message.delete();
         await message.channel.send(msg);
     }
 }

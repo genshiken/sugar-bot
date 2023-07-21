@@ -53,6 +53,10 @@ export class InfoCommand extends Command {
                 `Sugar: "Hey, I recognize this guy, nyaa!\nHis/her user point is ${totalUserScore
                     ._sum.amount!}\nKeep feeding me, nyaa!"`
             );
+            infoMessageEmbed.addField(
+                `Kratingd*eng in posession`,
+                `${user.powerup.length}`
+            );
             if (message.author.id === "145558597424644097") {
                 infoMessageEmbed.setTimestamp().setFooter({
                     text: `Btw, total score is  ${totalScore._sum.amount!}`,

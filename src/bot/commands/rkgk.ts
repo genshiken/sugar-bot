@@ -32,6 +32,8 @@ export class RkgkCommand extends Command {
                     data: {
                         uid: message.author.id,
                         name: message.author.username,
+                        powerup: [],
+                        active_powerup: "",
                     },
                 });
                 await message.channel.send("User created...");
@@ -65,6 +67,8 @@ export class RkgkCommand extends Command {
                     data: {
                         uid: message.author.id,
                         name: message.author.username,
+                        powerup: [],
+                        active_powerup: "",
                     },
                 });
                 await message.channel.send("User created...");
