@@ -28,3 +28,13 @@ model users {
   powerup String[]
   active_powerup String?
 }
+
+model userstate {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  actionPoint Int
+  uid String
+  physical Int
+  affection Int
+  fatigue Int
+  boredom Int
+}

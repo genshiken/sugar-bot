@@ -1,0 +1,52 @@
+/** Sugar no Seikatsu - Kikai
+ * Define user or player as state machine
+ * Each player has their action points which replenish by 50 on each time transition
+ * Max action points defined by base value and Sugar's stats
+ */
+
+import { mutateState, type Action } from "./Actions";
+import { events } from "./Events";
+import { timeSection } from "./Schedule";
+
+/** Sugar no *ryoku
+ * Define stats and abilities Sugar has
+ *
+ * - Physical : self explanatory
+ * - Affection : self explanatory
+ * - Fatigue : dont abuse the cat
+ * - Boredom : Sugar has heart too
+ */
+export type SugarStats = {
+    physical: number;
+    affection: number;
+    fatigue: number;
+    boredom: number;
+};
+
+export interface UserStateMachine {
+    id: string;
+    name: string;
+    actionPoint: number;
+
+    stats: SugarStats;
+}
+
+export const transitionState = (
+    action: Action,
+    time: Date,
+    user: UserStateMachine
+): UserStateMachine => {
+    // determine if action is valid
+    const section = timeSection(time);
+    const validActions = events[section];
+    const searchedAction = validActions.find((x) => x.name === action.name);
+    if (!searchedAction) return user; //stops, return original state without mutating
+    // mutate state
+    let stat = { ...user.stats };
+    stat = mutateState(searchedAction, stat);
+
+    // define immutability
+    let temp = { ...user };
+    temp.stats = stat;
+    return temp;
+};
