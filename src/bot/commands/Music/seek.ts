@@ -20,7 +20,7 @@ export class SeekPlayerCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message, args: Args) {
+    public override async messageRun(message: Message, args: Args) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -31,7 +31,9 @@ export class SeekPlayerCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         try {
@@ -49,7 +51,9 @@ export class SeekPlayerCommand extends Command {
                 }
             }
             if (!isValid) {
-                await message.channel.send("Invalid string. Please input with format [hh:][mm:]ss");
+                await message.channel.send(
+                    "Invalid string. Please input with format [hh:][mm:]ss"
+                );
                 return;
             }
             if (data.length === 3) {
@@ -62,18 +66,28 @@ export class SeekPlayerCommand extends Command {
             } else if (data.length === 1) {
                 pos += Number(data[0]);
             } else {
-                await message.channel.send("Invalid string. Please input with format [hh:][mm:]ss");
+                await message.channel.send(
+                    "Invalid string. Please input with format [hh:][mm:]ss"
+                );
                 return;
             }
-            if (pos * 1000 > musicGuildInfo.queue[musicGuildInfo.currentPosition]?.info.length!) {
+            if (
+                pos * 1000 >
+                musicGuildInfo.queue[musicGuildInfo.currentPosition]?.info
+                    .length!
+            ) {
                 await message.channel.send("Out of range.");
                 return;
             }
             musicGuildInfo.player.seekTo(pos * 1000);
-            await message.channel.send(`Player seeked to position ${fancyTimeFormat(pos)}`);
+            await message.channel.send(
+                `Player seeked to position ${fancyTimeFormat(pos)}`
+            );
             return;
         } catch (error) {
-            await message.channel.send("Error on command. Please put non-zero positive integer for both arguments");
+            await message.channel.send(
+                "Error on command. Please put non-zero positive integer for both arguments"
+            );
             return;
         }
     }

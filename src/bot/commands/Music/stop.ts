@@ -12,7 +12,7 @@ export class StopMusicCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -23,13 +23,17 @@ export class StopMusicCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         await musicGuildInfo.player.stopTrack();
         const shoukakuManager = getShoukakuManager();
         if (!shoukakuManager) {
-            await message.channel.send("Music manager uninitizalied. Check your implementation, dumbass");
+            await message.channel.send(
+                "Music manager uninitizalied. Check your implementation, dumbass"
+            );
             return;
         }
         shoukakuManager.getNode()?.leaveChannel(message.guildId!);

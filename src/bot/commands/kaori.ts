@@ -11,7 +11,7 @@ export class KaoriCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         await message.channel.send("Kaori mentioned.");
         await message.channel.send(
             "https://cdn.discordapp.com/attachments/699967986471272510/1007334443842801795/kaori_gelud.mp4"

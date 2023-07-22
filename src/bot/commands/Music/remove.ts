@@ -12,7 +12,7 @@ export class RemoveFromQueueCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message, args: Args) {
+    public override async messageRun(message: Message, args: Args) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -23,7 +23,9 @@ export class RemoveFromQueueCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         try {
@@ -33,15 +35,27 @@ export class RemoveFromQueueCommand extends Command {
                 await message.channel.send("Out of range track number.");
                 return;
             }
-            if (musicGuildInfo.isPlaying && musicGuildInfo.currentPosition === posToRemove - 1) {
-                await message.channel.send("Cannot remove currently playing track.");
+            if (
+                musicGuildInfo.isPlaying &&
+                musicGuildInfo.currentPosition === posToRemove - 1
+            ) {
+                await message.channel.send(
+                    "Cannot remove currently playing track."
+                );
                 return;
             }
-            const deletedTracks = musicGuildInfo.queue.splice(posToRemove - 1, 1);
-            await message.channel.send(`Removed track **${deletedTracks[0]?.info.title}** from the queue.`);
+            const deletedTracks = musicGuildInfo.queue.splice(
+                posToRemove - 1,
+                1
+            );
+            await message.channel.send(
+                `Removed track **${deletedTracks[0]?.info.title}** from the queue.`
+            );
             return;
         } catch (error) {
-            await message.channel.send("Error on command. Please put non-zero positive integer");
+            await message.channel.send(
+                "Error on command. Please put non-zero positive integer"
+            );
             return;
         }
     }

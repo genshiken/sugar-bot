@@ -11,7 +11,7 @@ export class RandomCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         const rand = Math.floor(Math.random() * 100);
         await message.channel.send(
             `RNGoddess has bestowed upon thee with the number **${rand}**`

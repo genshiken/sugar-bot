@@ -8,19 +8,29 @@ export class ChooseCommand extends Command {
             name: "chs",
             aliases: ["choose", "pilih", "mending"],
             quotes: [],
-            description: "Choose from random items. Separated with whitespace(s) or a comma (with optional trailing spaces).",
+            description:
+                "Choose from random items. Separated with whitespace(s) or a comma (with optional trailing spaces).",
         });
     }
 
-    public async messageRun(message: Message, args: Args) {
+    public override async messageRun(message: Message, args: Args) {
         const r = /(?:[^\s(\"|\')]+|(\"|\')[^(\"|\')]*(\"|\'))+/gi;
         let allItems: string[] = [];
-        const responses = ["", "Hmm... ", "*refuses to elaborate further* ", "I don't know, prolly... ", "It's obvious."];
+        const responses = [
+            "",
+            "Hmm... ",
+            "*refuses to elaborate further* ",
+            "I don't know, prolly... ",
+            "It's obvious.",
+        ];
         try {
-            const stringArgs = (await args.rest("string"));
+            const stringArgs = await args.rest("string");
             allItems = stringArgs.match(r)!;
-            const picked = allItems[Math.floor(Math.random() * allItems.length)]!.replace(/^"(.*)"$|^'(.*)'$/g, "$1$2");
-            const resp = responses[Math.floor(Math.random() * responses.length)]!;
+            const picked = allItems[
+                Math.floor(Math.random() * allItems.length)
+            ]!.replace(/^"(.*)"$|^'(.*)'$/g, "$1$2");
+            const resp =
+                responses[Math.floor(Math.random() * responses.length)]!;
             await message.channel.send(`${resp} \n${picked}`);
         } catch (error) {
             await message.channel.send(

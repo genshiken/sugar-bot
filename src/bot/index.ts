@@ -1,19 +1,27 @@
 import { SapphireClient } from "@sapphire/framework";
 import type { ThreadChannel } from "discord.js";
+import { GatewayIntentBits, Partials } from "discord.js";
 import { Connectors, Shoukaku } from "shoukaku";
 import { config } from "../config";
 import { setShoukakuManager } from "../lib/musicQueue";
 
 function createBotApp() {
     const client = new SapphireClient({
+        // intents: [
+        //     "GUILDS",
+        //     "GUILD_MESSAGES",
+        //     "DIRECT_MESSAGES",
+        //     "DIRECT_MESSAGE_TYPING",
+        //     "GUILD_VOICE_STATES",
+        // ],
         intents: [
-            "GUILDS",
-            "GUILD_MESSAGES",
-            "DIRECT_MESSAGES",
-            "DIRECT_MESSAGE_TYPING",
-            "GUILD_VOICE_STATES",
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageTyping,
+            GatewayIntentBits.GuildVoiceStates,
         ],
-        partials: ["USER", "CHANNEL"],
+        partials: [Partials.User, Partials.Channel],
         regexPrefix: config.botPrefix,
     });
     const nodes = [

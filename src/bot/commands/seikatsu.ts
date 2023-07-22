@@ -1,5 +1,5 @@
 import { Command } from "@sapphire/framework";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import prisma from "../../lib/prisma";
 import { printTimeSection, timeSection } from "../../lib/seikatsu/Schedule";
 import type { SugarStats, UserStateMachine } from "../../lib/seikatsu/Engine";
@@ -14,7 +14,7 @@ export class SeikatsuCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         // const user = await prisma.users.findFirst({
         //     where: {
         //         uid: message.author.id,
@@ -25,16 +25,16 @@ export class SeikatsuCommand extends Command {
         const section = timeSection(localTime);
         // display valid actions
         // create discord embed
-        const embed = new MessageEmbed();
+        const embed = new EmbedBuilder();
         embed.setTitle("Sugar no Seikatsu -- ~~BETA~~ OMEGA");
-        embed.addField(
-            "Phase of Day (Waktu Internal Sugar)",
-            printTimeSection(section)
-        );
-        embed.addField(
-            "Time (Waktu Internal Sugar)",
-            `${localTime.getHours()}:${localTime.getMinutes()}`
-        );
+        embed.addFields({
+            name: "Phase of Day (Waktu Internal Sugar)",
+            value: printTimeSection(section),
+        });
+        embed.addFields({
+            name: "Time (Waktu Internal Sugar)",
+            value: `${localTime.getHours()}:${localTime.getMinutes()}`,
+        });
 
         // check if user has stats defined
         let userstats = await prisma.userstate.findFirst({
@@ -69,10 +69,26 @@ export class SeikatsuCommand extends Command {
             });
         }
         // post initialization
-        embed.addField("Physical", userstats.physical.toString(), true);
-        embed.addField("Affection", userstats.affection.toString(), true);
-        embed.addField("Fatigue", userstats.fatigue.toString(), true);
-        embed.addField("Boredom", userstats.boredom.toString(), true);
+        embed.addFields({
+            name: "Physical",
+            value: userstats.physical.toString(),
+            inline: true,
+        });
+        embed.addFields({
+            name: "Affection",
+            value: userstats.affection.toString(),
+            inline: true,
+        });
+        embed.addFields({
+            name: "Fatigue",
+            value: userstats.fatigue.toString(),
+            inline: true,
+        });
+        embed.addFields({
+            name: "Boredom",
+            value: userstats.boredom.toString(),
+            inline: true,
+        });
 
         embed.setFooter({ text: "Actions [WIP]" });
         await message.channel.send({

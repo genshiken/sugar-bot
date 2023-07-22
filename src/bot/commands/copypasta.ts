@@ -30,7 +30,7 @@ export class CopyPastaCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         if (message.author.id !== "145558597424644097") {
             await message.channel.send("Bot owner level feature, for now...");
             return;

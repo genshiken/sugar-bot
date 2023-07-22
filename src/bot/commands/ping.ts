@@ -11,7 +11,7 @@ export class PingCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         const msg = await message.channel.send("Ping?");
         const content = `Pong!!! Bot latency: ${Math.round(
             this.container.client.ws.ping

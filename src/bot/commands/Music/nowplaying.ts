@@ -1,6 +1,6 @@
 import { Command } from "@sapphire/framework";
 import { Formatters, Message } from "discord.js";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import musicManager, { getShoukakuManager } from "../../../lib/musicQueue";
 import { fancyTimeFormat } from "../../../lib/utils";
 // import prisma from "../../lib/prisma";
@@ -15,7 +15,7 @@ export class NowPlayingMusicCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -26,17 +26,23 @@ export class NowPlayingMusicCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         const shoukakuManager = getShoukakuManager();
         if (!shoukakuManager) {
-            await message.channel.send("Music manager uninitizalied. Check your implementation, dumbass");
+            await message.channel.send(
+                "Music manager uninitizalied. Check your implementation, dumbass"
+            );
             return;
         }
         const lavalinkNode = shoukakuManager.getNode();
         if (!lavalinkNode) {
-            await message.channel.send("No music player node currently connected.");
+            await message.channel.send(
+                "No music player node currently connected."
+            );
             return;
         }
         if (musicGuildInfo.queue.length === 0) {
@@ -48,11 +54,13 @@ export class NowPlayingMusicCommand extends Command {
         const paginatedMessage = new PaginatedMessage();
         let i = 0;
         if (queue.length < 10) {
-            const page = new MessageEmbed();
+            const page = new EmbedBuilder();
             page.setTitle("Now playing queue...");
             let msg = "";
             for (const track of queue) {
-                msg += `${i + 1}. ${track.info.title} - Duration ${fancyTimeFormat(track.info.length! / 1000)}\n`;
+                msg += `${i + 1}. ${
+                    track.info.title
+                } - Duration ${fancyTimeFormat(track.info.length! / 1000)}\n`;
                 i++;
             }
             page.setDescription(msg);
@@ -70,9 +78,17 @@ export class NowPlayingMusicCommand extends Command {
                 if (pageCounter < totalPages - 1) {
                     for (let j = 0; j < 10; j++) {
                         if (musicGuildInfo.currentPosition === i) {
-                            msg += `**${i + 1}. ${queue[i]?.info.title} - Duration ${fancyTimeFormat(queue[i]?.info.length! / 1000)}**\n`;
+                            msg += `**${i + 1}. ${
+                                queue[i]?.info.title
+                            } - Duration ${fancyTimeFormat(
+                                queue[i]?.info.length! / 1000
+                            )}**\n`;
                         } else {
-                            msg += `${i + 1}. ${queue[i]?.info.title} - Duration ${fancyTimeFormat(queue[i]?.info.length! / 1000)}\n`;
+                            msg += `${i + 1}. ${
+                                queue[i]?.info.title
+                            } - Duration ${fancyTimeFormat(
+                                queue[i]?.info.length! / 1000
+                            )}\n`;
                         }
                         i++;
                     }
@@ -85,9 +101,17 @@ export class NowPlayingMusicCommand extends Command {
                 } else {
                     for (let j = i; j < queue.length; j++) {
                         if (musicGuildInfo.currentPosition === i) {
-                            msg += `**${i + 1}. ${queue[i]?.info.title} - Duration ${fancyTimeFormat(queue[i]?.info.length! / 1000)}**\n`;
+                            msg += `**${i + 1}. ${
+                                queue[i]?.info.title
+                            } - Duration ${fancyTimeFormat(
+                                queue[i]?.info.length! / 1000
+                            )}**\n`;
                         } else {
-                            msg += `${i + 1}. ${queue[i]?.info.title} - Duration ${fancyTimeFormat(queue[i]?.info.length! / 1000)}\n`;
+                            msg += `${i + 1}. ${
+                                queue[i]?.info.title
+                            } - Duration ${fancyTimeFormat(
+                                queue[i]?.info.length! / 1000
+                            )}\n`;
                         }
                         i++;
                     }
@@ -100,16 +124,24 @@ export class NowPlayingMusicCommand extends Command {
                 }
             }
         }
-        const embedMessage = new MessageEmbed();
-        const currentTrack = musicGuildInfo.queue[musicGuildInfo.currentPosition];
-        const npString = `${fancyTimeFormat(musicGuildInfo.player.position / 1000)} / ${fancyTimeFormat(currentTrack?.info.length! / 1000)}`;
+        const embedMessage = new EmbedBuilder();
+        const currentTrack =
+            musicGuildInfo.queue[musicGuildInfo.currentPosition];
+        const npString = `${fancyTimeFormat(
+            musicGuildInfo.player.position / 1000
+        )} / ${fancyTimeFormat(currentTrack?.info.length! / 1000)}`;
         embedMessage.setTitle("Closure: Now Playing...");
-        embedMessage.addField(currentTrack?.info.title!, currentTrack?.info.uri!);
-        embedMessage.addField("Position", npString);
+        embedMessage.addFields({
+            name: currentTrack?.info.title!,
+            value: currentTrack?.info.uri!,
+        });
+        embedMessage.addFields({ name: "Position", value: npString });
         let currentPage = Math.floor(musicGuildInfo.currentPosition / 10);
         paginatedMessage.setIndex(currentPage);
         paginatedMessage.setWrongUserInteractionReply((targetUser) => ({
-            content: `Even if you fiddle with my buttons, my heart belongs to ${Formatters.userMention(targetUser.id)}-sama alone.`,
+            content: `Even if you fiddle with my buttons, my heart belongs to ${Formatters.userMention(
+                targetUser.id
+            )}-sama alone.`,
             ephemeral: true,
             allowedMentions: {
                 users: [],

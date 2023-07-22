@@ -18,7 +18,7 @@ export class SimulateGachaCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         const foods: Response[] = [
             {
                 name: "Donut (Common)",

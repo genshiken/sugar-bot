@@ -14,7 +14,7 @@ export class RkgkCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message, args: Args) {
+    public override async messageRun(message: Message, args: Args) {
         // check if user exist
         const mode = await args.pick("string");
         if (mode === "register") {

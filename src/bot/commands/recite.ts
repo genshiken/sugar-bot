@@ -11,7 +11,7 @@ export class ReciteCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         var verse: string;
         var verses: string[];
         const num = Math.floor(Math.random() * 2);

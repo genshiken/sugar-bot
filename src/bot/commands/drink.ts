@@ -12,7 +12,7 @@ export class DrinkCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         const user = await prisma.users.findFirst({
             where: {
                 uid: message.author.id,

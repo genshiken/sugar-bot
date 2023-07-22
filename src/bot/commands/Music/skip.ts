@@ -12,7 +12,7 @@ export class SkipMusicCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -23,7 +23,9 @@ export class SkipMusicCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         // check if there is a current playing track

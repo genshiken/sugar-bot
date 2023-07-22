@@ -13,7 +13,7 @@ export class PauseMusicCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         if (!message.guildId) {
             await message.channel.send("This command only works in servers");
             return;
@@ -24,12 +24,16 @@ export class PauseMusicCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send("No bot in voice channel. Are you okay?");
+            await message.channel.send(
+                "No bot in voice channel. Are you okay?"
+            );
             return;
         }
         musicGuildInfo.player.setPaused(!musicGuildInfo.isPausing);
         musicGuildInfo.isPausing = !musicGuildInfo.isPausing;
-        await message.channel.send(musicGuildInfo.player.paused ? "Pausing..." : "Resuming...");
+        await message.channel.send(
+            musicGuildInfo.player.paused ? "Pausing..." : "Resuming..."
+        );
         return;
         // const shoukakuManager = getShoukakuManager();
         // if (!shoukakuManager) {

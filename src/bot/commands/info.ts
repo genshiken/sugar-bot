@@ -1,5 +1,5 @@
 import { Command } from "@sapphire/framework";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, EmbedBuilder } from "discord.js";
 import prisma from "../../lib/prisma";
 
 export class InfoCommand extends Command {
@@ -12,28 +12,28 @@ export class InfoCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message) {
+    public override async messageRun(message: Message) {
         const user = await prisma.users.findFirst({
             where: {
                 uid: message.author.id,
             },
         });
-        const infoMessageEmbed = new MessageEmbed();
-        infoMessageEmbed.setTitle("User Info");
-        infoMessageEmbed.addField(
-            `Common Info`,
-            `Name: **${message.author.username}**\nUserId: ${
+        const infoEmbedBuilder = new EmbedBuilder();
+        infoEmbedBuilder.setTitle("User Info");
+        infoEmbedBuilder.addFields({
+            name: `Common Info`,
+            value: `Name: **${message.author.username}**\nUserId: ${
                 message.author.id
             }\nNickname: ${
                 (await message.guild!.members.fetch(message.author.id))
                     .displayName
-            }`
-        );
+            }`,
+        });
         if (!user) {
-            infoMessageEmbed.addField(
-                "Relation with Sugar",
-                `Sugar: "who are you?"`
-            );
+            infoEmbedBuilder.addFields({
+                name: "Relation with Sugar",
+                value: `Sugar: "who are you?"`,
+            });
         } else {
             const totalUserScore = await prisma.feedrecord.aggregate({
                 _sum: {
@@ -48,21 +48,21 @@ export class InfoCommand extends Command {
                     amount: true,
                 },
             });
-            infoMessageEmbed.addField(
-                `Relation with Sugar`,
-                `Sugar: "Hey, I recognize this guy, nyaa!\nHis/her user point is ${totalUserScore
-                    ._sum.amount!}\nKeep feeding me, nyaa!"`
-            );
-            infoMessageEmbed.addField(
-                `Kratingd*eng in posession`,
-                `${user.powerup.length}`
-            );
+            infoEmbedBuilder.addFields({
+                name: `Relation with Sugar`,
+                value: `Sugar: "Hey, I recognize this guy, nyaa!\nHis/her user point is ${totalUserScore
+                    ._sum.amount!}\nKeep feeding me, nyaa!"`,
+            });
+            infoEmbedBuilder.addFields({
+                name: `Kratingd*eng in posession`,
+                value: `${user.powerup.length}`,
+            });
             if (message.author.id === "145558597424644097") {
-                infoMessageEmbed.setTimestamp().setFooter({
+                infoEmbedBuilder.setTimestamp().setFooter({
                     text: `Btw, total score is  ${totalScore._sum.amount!}`,
                 });
             }
         }
-        await message.channel.send({ embeds: [infoMessageEmbed] });
+        await message.channel.send({ embeds: [infoEmbedBuilder] });
     }
 }

@@ -1,5 +1,5 @@
 import { Args, Command } from "@sapphire/framework";
-import { Formatters, Message, MessageEmbed } from "discord.js";
+import { Formatters, Message, EmbedBuilder } from "discord.js";
 import prisma from "../../lib/prisma";
 import { sub, formatDistanceToNow } from "date-fns";
 import { config } from "../../config";
@@ -76,7 +76,7 @@ export class FeedCommand extends Command {
         });
     }
 
-    public async messageRun(message: Message, args: Args) {
+    public override async messageRun(message: Message, args: Args) {
         const isRequestingHistory = args.getFlags("history", "h");
         const isRequestingLeaderboard = args.getFlags("l");
         if (isRequestingLeaderboard) {
@@ -97,7 +97,7 @@ export class FeedCommand extends Command {
                     },
                 },
             });
-            const embed = new MessageEmbed();
+            const embed = new EmbedBuilder();
             embed.setTitle("Sugar Leaderboard");
             let msg = "";
             let i = 0;
@@ -128,7 +128,7 @@ export class FeedCommand extends Command {
                 },
                 take: 10,
             });
-            const embed = new MessageEmbed();
+            const embed = new EmbedBuilder();
             embed.setTitle(
                 `Feed history for ${
                     (await message.guild.members.fetch(message.author.id))
