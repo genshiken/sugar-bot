@@ -4,7 +4,7 @@
  * Max action points defined by base value and Sugar's stats
  */
 
-import type { userstate } from "@prisma/client";
+// import type { userstate } from "@prisma/client";
 import { mutateState, type Action } from "./Actions";
 import { events } from "./Events";
 import { timeSection } from "./Schedule";
@@ -55,7 +55,7 @@ export const transitionState = (
 };
 
 export const stateMachineDataFromUserState = (
-    userState: userstate
+    userState: any
 ): UserStateMachine => {
     return {
         id: userState.uid,
