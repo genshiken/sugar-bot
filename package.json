@@ -7,13 +7,15 @@
     "scripts": {
         "build": "tsc -p tsconfig.json",
         "start": "node build/index.js",
-        "dev": "cross-env NODE_ENV=development node build/index.js"
+        "dev": "cross-env NODE_ENV=development node build/index.js",
+        "watch": "tscc -p tsconfig.json --watch"
     },
     "dependencies": {
         "@fastify/routes": "^5.0.0",
         "@fastify/swagger": "^7.3.0",
         "@prisma/client": "^4.2.1",
         "@sapphire/framework": "^4.5.1",
+        "@sapphire/plugin-hmr": "^2.0.1",
         "@types/mime-types": "^2.1.1",
         "axios": "^0.27.2",
         "cross-env": "^7.0.3",

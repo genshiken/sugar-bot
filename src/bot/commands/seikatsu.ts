@@ -1,8 +1,15 @@
 import { Command } from "@sapphire/framework";
-import { Message, EmbedBuilder } from "discord.js";
+import {
+    Message,
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+} from "discord.js";
 import prisma from "../../lib/prisma";
 import { printTimeSection, timeSection } from "../../lib/seikatsu/Schedule";
 import type { SugarStats, UserStateMachine } from "../../lib/seikatsu/Engine";
+import { events } from "../../lib/seikatsu/Events";
+import { timeoutSet } from "../../lib/timeout";
 
 export class SeikatsuCommand extends Command {
     public constructor(context: Command.Context, options: Command.Options) {
@@ -25,16 +32,6 @@ export class SeikatsuCommand extends Command {
         const section = timeSection(localTime);
         // display valid actions
         // create discord embed
-        const embed = new EmbedBuilder();
-        embed.setTitle("Sugar no Seikatsu -- ~~BETA~~ OMEGA");
-        embed.addFields({
-            name: "Phase of Day (Waktu Internal Sugar)",
-            value: printTimeSection(section),
-        });
-        embed.addFields({
-            name: "Time (Waktu Internal Sugar)",
-            value: `${localTime.getHours()}:${localTime.getMinutes()}`,
-        });
 
         // check if user has stats defined
         let userstats = await prisma.userstate.findFirst({
@@ -68,6 +65,16 @@ export class SeikatsuCommand extends Command {
                 data: tempState,
             });
         }
+        const embed = new EmbedBuilder();
+        embed.setTitle("Sugar no Seikatsu -- ~~BETA~~ OMEGA");
+        embed.addFields({
+            name: "Phase of Day (Waktu Internal Sugar)",
+            value: printTimeSection(section),
+        });
+        embed.addFields({
+            name: "Time (Waktu Internal Sugar)",
+            value: `${localTime.getHours()}:${localTime.getMinutes()}`,
+        });
         // post initialization
         embed.addFields({
             name: "Physical",
@@ -89,23 +96,47 @@ export class SeikatsuCommand extends Command {
             value: userstats.boredom.toString(),
             inline: true,
         });
-
-        embed.setFooter({ text: "Actions [WIP]" });
-        await message.channel.send({
-            embeds: [embed],
+        embed.addFields({
+            name: "Action Points",
+            value: userstats.actionPoint.toString(),
+            inline: true,
         });
-        /* if (!sentMessage) return
+
         // List valid actions
         const actions = events[section];
-        let i = 1
-        actions.forEach(async (action) => {
-        `2⃣`
-            // actionRow.addComponents(
-            //     new MessageButton()
-            //         .setLabel(`${action.name} - ${action.actionPoint}`)
-            //         .setCustomId(`seikatsu#${section}#${action.name}`)
-            //         .setStyle(1)
-            // );
-        }); */
+        const actionRow = new ActionRowBuilder<ButtonBuilder>();
+        actions
+            .filter((x) => x.actionPoint <= userstats!.actionPoint)
+            .forEach(async (action) => {
+                actionRow.addComponents(
+                    new ButtonBuilder()
+                        .setLabel(`${action.name} - ${action.actionPoint}`)
+                        .setCustomId(
+                            `seikatsu#${section}#${action.name}#${message.author.id}`
+                        )
+                        .setStyle(1)
+                );
+            });
+
+        embed.setFooter({ text: "Actions [WIP]" });
+        let sentMessage: Message<false> | Message<true>;
+        if (actionRow.components.length === 0) {
+            sentMessage = await message.channel.send({
+                embeds: [embed],
+            });
+        } else {
+            sentMessage = await message.channel.send({
+                embeds: [embed],
+                components: [actionRow],
+            });
+        }
+        if (!timeoutSet.has(sentMessage.id)) {
+            timeoutSet.add(sentMessage.id);
+            setTimeout(() => {
+                sentMessage.delete();
+                timeoutSet.delete(sentMessage.id);
+            }, 60000);
+        }
+        await message.delete();
     }
 }

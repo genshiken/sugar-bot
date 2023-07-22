@@ -4,7 +4,9 @@ import { GatewayIntentBits, Partials } from "discord.js";
 import { Connectors, Shoukaku } from "shoukaku";
 import { config } from "../config";
 import { setShoukakuManager } from "../lib/musicQueue";
-
+import "@sapphire/plugin-hmr/register";
+import prisma from "../lib/prisma";
+import logger from "../lib/winston";
 function createBotApp() {
     const client = new SapphireClient({
         // intents: [
@@ -20,9 +22,12 @@ function createBotApp() {
             GatewayIntentBits.DirectMessages,
             GatewayIntentBits.DirectMessageTyping,
             GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.MessageContent,
         ],
         partials: [Partials.User, Partials.Channel],
         regexPrefix: config.botPrefix,
+        loadMessageCommandListeners: true,
+        hmr: { enabled: true },
     });
     const nodes = [
         {
@@ -52,6 +57,43 @@ function createBotApp() {
             }
         }
     }, 5000);
+    // start incrementor
+    setInterval(async () => {
+        await prisma.userstate.updateMany({
+            where: {
+                actionPoint: {
+                    lt: 50,
+                },
+            },
+            data: {
+                actionPoint: {
+                    increment: 1,
+                },
+            },
+        });
+        logger.info(
+            `[seikatsu] AP incrementor ran at ${new Date().toLocaleString()}}`
+        );
+    }, 30000 * 10);
+    setInterval(async () => {
+        await new Promise((res) => setTimeout(res, 5000));
+        await prisma.userstate.updateMany({
+            where: {
+                boredom: {
+                    gte: 0,
+                    lte: 100,
+                },
+            },
+            data: {
+                boredom: {
+                    increment: 3,
+                },
+            },
+        });
+        logger.info(
+            `[seikatsu] Boredom incrementor ran at ${new Date().toLocaleString()}}`
+        );
+    }, 60000 * 10);
     return client;
 }
 
