@@ -1,6 +1,6 @@
-FROM node:16-buster-slim as builder
+FROM node:16 as builder
 WORKDIR /tmp
-COPY package.json tsconfig.json /tmp/
+COPY package.json tsconfig.json yarn.lock /tmp/
 RUN npm install
 COPY ./src ./src
 RUN npm run build
@@ -8,7 +8,7 @@ RUN npm run build
 FROM node:16-buster-slim
 WORKDIR /usr/src/app
 COPY package.json ./
-RUN apt-get update && apt-get install openssl -y
+RUN apt-get update && apt-get install openssl git -y
 RUN npm install
 COPY --from=builder /tmp/build ./build
 COPY ./prisma ./prisma
