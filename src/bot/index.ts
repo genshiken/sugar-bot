@@ -29,20 +29,35 @@ function createBotApp() {
         loadMessageCommandListeners: true,
         hmr: { enabled: true },
     });
-    const nodes = [
-        {
+    const nodes = [];
+    if (process.env["NODE_ENV"] === "development") {
+        nodes.push({
             name: "local",
+            url: "localhost:2333",
+            auth: "youshallnotpass",
+        });
+    } else {
+        nodes.push({
+            name: "kureya",
             url: "kureya.howlingmoon.dev:14045",
             auth: process.env["KUREYA_LAVALINK_PASSWORD"]!,
-        },
-    ];
+        });
+    }
     if (config.music) {
-        const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes);
+        logger.info("Initializing Shoukaku connector");
+        const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes, {
+            resume: true,
+            resumeByLibrary: true,
+        });
+
         setShoukakuManager(manager);
-        // await manager.connect();
         manager.on("error", (_, err) => {
-            console.error(`Shoukaku error.`);
-            console.error(err);
+            logger.error(`Shoukaku error.`);
+            logger.error(err);
+            console.log(err);
+        });
+        manager.on("ready", () => {
+            logger.info("Shoukaku manager is ready");
         });
     }
     client.login(process.env["DISCORD_BOT_TOKEN"]);
@@ -51,9 +66,7 @@ function createBotApp() {
         if (guild) {
             const chan = guild.channels.cache.get("1009656928852516914");
             if (chan) {
-                (chan as ThreadChannel).send(
-                    "Mrr.... oharo----gonyaimas.... （＞人＜；）"
-                );
+                (chan as ThreadChannel).send("Mrr.... oharo----gonyaimas.... （＞人＜；）");
             }
         }
     }, 5000);
@@ -71,9 +84,7 @@ function createBotApp() {
                 },
             },
         });
-        logger.info(
-            `[seikatsu] AP incrementor ran at ${new Date().toLocaleString()}}`
-        );
+        // logger.info(`[seikatsu] AP incrementor ran at ${new Date().toLocaleString()}}`);
     }, 30000 * 10);
     setInterval(async () => {
         await new Promise((res) => setTimeout(res, 5000));
@@ -90,9 +101,7 @@ function createBotApp() {
                 },
             },
         });
-        logger.info(
-            `[seikatsu] Boredom incrementor ran at ${new Date().toLocaleString()}}`
-        );
+        // logger.info(`[seikatsu] Boredom incrementor ran at ${new Date().toLocaleString()}}`);
     }, 60000 * 10);
     return client;
 }

@@ -1,6 +1,7 @@
 import { Command } from "@sapphire/framework";
 import type { Message } from "discord.js";
 import musicManager from "../../../lib/musicQueue";
+import logger from "../../../lib/winston";
 // import prisma from "../../lib/prisma";
 
 export class SkipMusicCommand extends Command {
@@ -9,6 +10,8 @@ export class SkipMusicCommand extends Command {
             ...options,
             name: "skip",
             description: "Skip playing music",
+            detailedDescription: `Skip currently playing track.
+            If "jump" command is previously used, it will skip to the track targeted by the previous "jump" command.`,
         });
     }
 
@@ -23,9 +26,7 @@ export class SkipMusicCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send(
-                "No bot in voice channel. Are you okay?"
-            );
+            await message.channel.send("No bot in voice channel. Are you okay?");
             return;
         }
         // check if there is a current playing track

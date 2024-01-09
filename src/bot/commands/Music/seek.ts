@@ -1,7 +1,9 @@
 import { Args, Command } from "@sapphire/framework";
 import type { Message } from "discord.js";
-import musicManager from "../../../lib/musicQueue";
+import { Track } from "shoukaku";
+import musicManager, { isGdriveLazyLoad, LavalinkLazyLoad } from "../../../lib/musicQueue";
 import { fancyTimeFormat } from "../../../lib/utils";
+import logger from "../../../lib/winston";
 // import logger from "../../../lib/winston";
 
 const digitsRegex = /^[0-9]{1,2}$/;
@@ -31,9 +33,7 @@ export class SeekPlayerCommand extends Command {
         }
         const musicGuildInfo = musicManager.get(message.guildId!);
         if (!musicGuildInfo) {
-            await message.channel.send(
-                "No bot in voice channel. Are you okay?"
-            );
+            await message.channel.send("No bot in voice channel. Are you okay?");
             return;
         }
         try {
@@ -51,9 +51,7 @@ export class SeekPlayerCommand extends Command {
                 }
             }
             if (!isValid) {
-                await message.channel.send(
-                    "Invalid string. Please input with format [hh:][mm:]ss"
-                );
+                await message.channel.send("Invalid string. Please input with format [hh:][mm:]ss");
                 return;
             }
             if (data.length === 3) {
@@ -66,28 +64,24 @@ export class SeekPlayerCommand extends Command {
             } else if (data.length === 1) {
                 pos += Number(data[0]);
             } else {
-                await message.channel.send(
-                    "Invalid string. Please input with format [hh:][mm:]ss"
-                );
+                await message.channel.send("Invalid string. Please input with format [hh:][mm:]ss");
                 return;
             }
-            if (
-                pos * 1000 >
-                musicGuildInfo.queue[musicGuildInfo.currentPosition]?.info
-                    .length!
-            ) {
+            let track = musicGuildInfo.queue[musicGuildInfo.currentPosition];
+            if (isGdriveLazyLoad(track)) {
+                track = track as LavalinkLazyLoad;
+                await message.channel.send("Cannot set seeking for GDrive track (yet)");
+                return;
+            }
+            if (pos * 1000 > (track as Track).info.length!) {
                 await message.channel.send("Out of range.");
                 return;
             }
             musicGuildInfo.player.seekTo(pos * 1000);
-            await message.channel.send(
-                `Player seeked to position ${fancyTimeFormat(pos)}`
-            );
+            await message.channel.send(`Player seeked to position ${fancyTimeFormat(pos)}`);
             return;
         } catch (error) {
-            await message.channel.send(
-                "Error on command. Please put non-zero positive integer for both arguments"
-            );
+            await message.channel.send("Error on command. Please put non-zero positive integer for both arguments");
             return;
         }
     }

@@ -1,31 +1,23 @@
 import { ChatInputCommand, Command } from "@sapphire/framework";
-import type { Message, TextBasedChannel } from "discord.js";
+import type { Message, TextBasedChannel, VoiceBasedChannel } from "discord.js";
 import musicManager from "../../../lib/musicQueue";
-import logger from "../../../lib/winston";
-// import prisma from "../../lib/prisma";
 
-export class PauseMusicCommand extends Command {
+export class NtrCommand extends Command {
     public constructor(context: Command.Context, options: Command.Options) {
         super(context, {
             ...options,
-            name: "pause",
-            aliases: ["continue", "resume"],
-            description: "Pause/continue playing music",
-            detailedDescription: `This command pause and resumes the currently playing music player in a server
-            It acts as simple toggle that will change the state to the opposite state.
-            It's... as straightforward is it could be.
-            But this won't make the player play if player reached the end of playlist and thus stopped.
-            You'll need to use the jump command. There might be plan to implement said feature in future.`,
+            name: "vcmove",
+            aliases: ["cmere", "come", "ntr"],
+            description: "Forcefully pulling the bot into voice channel you're in now.",
+            detailedDescription:
+                "An albeit weird naming, but it does the job.\nIf the bot is currently playing something in some other voice channel, it will be pulled into the voice channel you're currently in. Otherwise will do nothing if you're not even in any voice channel.",
         });
     }
 
     public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
-        registry.registerChatInputCommand(
-            (builder) => {
-                builder.setName("pause").setDescription("Pause/Resume currently playing track");
-            },
-            { idHints: ["1194230014053470278"] }
-        );
+        registry.registerChatInputCommand((builder) => {
+            builder.setName("ntr").setDescription("Pull the music player into your voice channel forcefully");
+        });
     }
 
     public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
@@ -45,7 +37,7 @@ export class PauseMusicCommand extends Command {
         }
         const guildId = interaction.guildId;
         await interaction.deferReply();
-        await this.pause(guildId, textChannel);
+        await this.ntr(guildId, textChannel, voiceChannel);
         await interaction.followUp({ content: "Pause command complete", ephemeral: true });
     }
 
@@ -60,19 +52,31 @@ export class PauseMusicCommand extends Command {
         }
         const guildId = message.guildId;
         const textChannel = message.channel;
+        const voiceChannel = message.member.voice.channel;
 
-        await this.pause(guildId, textChannel);
+        await this.ntr(guildId, textChannel, voiceChannel);
     }
 
-    public async pause(guildId: string, textChannel: TextBasedChannel) {
+    public async ntr(guildId: string, textChannel: TextBasedChannel, userVoiceChannel: VoiceBasedChannel) {
         const musicGuildInfo = musicManager.get(guildId);
         if (!musicGuildInfo) {
             await textChannel.send("No bot in voice channel. Are you okay?");
             return;
         }
-        musicGuildInfo.player.setPaused(!musicGuildInfo.isPausing);
-        musicGuildInfo.isPausing = !musicGuildInfo.isPausing;
-        await textChannel.send(musicGuildInfo.player.paused ? "Pausing..." : "Resuming...");
+        const client = this.container.client;
+        const guild = client.guilds.cache.get(guildId)!;
+        if (!guild) {
+            await textChannel.send("Somehow the guild object is empty. Debug this");
+            return;
+        }
+        const botUser = guild.members.cache.get(client.id!);
+        if (!botUser) {
+            await textChannel.send("Bot user not found.... wtf, then who am i?");
+            return;
+        }
+        botUser.voice.setChannel(userVoiceChannel);
+        musicGuildInfo.voiceChannel = userVoiceChannel;
+        await textChannel.send("Yes, yes, I'm coming!");
         return;
     }
 }

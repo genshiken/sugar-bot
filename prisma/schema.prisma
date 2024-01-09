@@ -38,3 +38,15 @@ model userstate {
   fatigue Int
   boredom Int
 }
+
+model Playlist {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  guildId     String
+  tracks      Json
+  dateCreated DateTime
+  name        String
+  private     Boolean?
+
+  @@unique([userId, name])
+}
