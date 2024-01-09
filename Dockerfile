@@ -1,11 +1,11 @@
-FROM node:16 as builder
+FROM node:18 as builder
 WORKDIR /tmp
 COPY package.json tsconfig.json yarn.lock /tmp/
 RUN npm install
 COPY ./src ./src
 RUN npm run build
 
-FROM node:16-buster-slim
+FROM node:18-buster-slim
 WORKDIR /usr/src/app
 COPY package.json ./
 RUN apt-get update && apt-get install openssl git -y
