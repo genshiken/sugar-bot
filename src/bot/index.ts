@@ -7,7 +7,7 @@ import { setShoukakuManager } from "../lib/musicQueue";
 import "@sapphire/plugin-hmr/register";
 import prisma from "../lib/prisma";
 import logger from "../lib/winston";
-function createBotApp() {
+async function createBotApp() {
     const client = new SapphireClient({
         // intents: [
         //     "GUILDS",
@@ -29,21 +29,16 @@ function createBotApp() {
         loadMessageCommandListeners: true,
         hmr: { enabled: true },
     });
-    const nodes = [];
-    if (process.env["NODE_ENV"] === "development") {
-        nodes.push({
-            name: "local",
-            url: "localhost:2333",
-            auth: "youshallnotpass",
-        });
-    } else {
-        nodes.push({
-            name: "kureya",
-            url: "kureya.howlingmoon.dev:14045",
-            auth: process.env["KUREYA_LAVALINK_PASSWORD"]!,
-        });
-    }
-    if (config.music) {
+    console.log(process.env);
+    console.log(config);
+    if (config.music && config.lavalinkConfigPath) {
+        const nodes = [];
+        const lavalinkNodeConfig = await fetch(config.lavalinkConfigPath).then((res) => res.json());
+        console.log(lavalinkNodeConfig);
+        for (const node of lavalinkNodeConfig) {
+            logger.info(`Added ${node.name} to lavalink node pool`);
+            nodes.push(node);
+        }
         logger.info("Initializing Shoukaku connector");
         const manager = new Shoukaku(new Connectors.DiscordJS(client), nodes, {
             resume: true,
