@@ -68,6 +68,12 @@ export class PauseMusicCommand extends Command {
             await textChannel.send("Uninitialized shoukaku client. Is this even possible?");
             return;
         }
+        const musicGuildInfo = musicManager.get(guildId!);
+        if (musicGuildInfo) {
+            await musicGuildInfo.player.stopTrack();
+        }
+        await shoukaku.leaveVoiceChannel(guildId);
+        musicManager.delete(guildId);
         const nodes: NodeOption[] = [];
         const lavalinkNodeConfig = await fetch(config.lavalinkConfigPath).then((res) => res.json());
         for (const node of lavalinkNodeConfig) {
