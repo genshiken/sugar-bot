@@ -4,6 +4,7 @@ import { GatewayIntentBits, Partials } from "discord.js";
 import { Connectors, Shoukaku } from "shoukaku";
 import { config } from "../config";
 import { setShoukakuManager } from "../lib/musicQueue";
+import fetch from "node-fetch";
 import "@sapphire/plugin-hmr/register";
 import prisma from "../lib/prisma";
 import logger from "../lib/winston";

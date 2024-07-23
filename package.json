@@ -28,6 +28,7 @@
         "fastify-plugin": "^3.0.1",
         "form-data": "^4.0.0",
         "mime-types": "^2.1.35",
+        "node-fetch": "^2.7.0",
         "request": "^2.88.2",
         "shoukaku": "^4.0.1",
         "winston": "^3.8.2",
@@ -36,6 +37,7 @@
     "devDependencies": {
         "@tsconfig/node16": "^16.1.1",
         "@types/node": "^17.0.41",
+        "@types/node-fetch": "2",
         "@types/request": "^2.48.8",
         "prisma": "^4.2.1",
         "typescript": "^5.5.3"

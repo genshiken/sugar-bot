@@ -78,7 +78,7 @@ export class FeedCommand extends Command {
 
         if (isRequestingInfo) {
             const embed = new EmbedBuilder();
-            const fields = [];
+            const fields: any[] = [];
             fields.push({
                 name: "Drop Rate",
                 value: Object.entries(GachaRate)

@@ -4,6 +4,7 @@ import musicManager, { getShoukakuManager } from "../../../lib/musicQueue";
 import logger from "../../../lib/winston";
 import { config } from "../../../config";
 import { NodeOption } from "shoukaku";
+import fetch from "node-fetch";
 // import prisma from "../../lib/prisma";
 
 export class PauseMusicCommand extends Command {
