@@ -1,15 +1,17 @@
 FROM node:18 as builder
 WORKDIR /tmp
-COPY package.json tsconfig.json package-lock.json /tmp/
-RUN npm install
+COPY package.json tsconfig.json pnpm-lock.yaml /tmp/
+RUN npm install -g pnpm
+RUN pnpm install
 COPY ./src ./src
-RUN npm run build
+RUN pnpm run build
 
 FROM node:18-buster-slim
 WORKDIR /usr/src/app
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml ./
 RUN apt-get update && apt-get install openssl git -y
-RUN npm install
+RUN npm install -g pnpm
+RUN pnpm install
 COPY --from=builder /tmp/build ./build
 COPY ./prisma ./prisma
 RUN npx prisma generate
