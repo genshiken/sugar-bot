@@ -3,26 +3,28 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model danbooruusers {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(uuid())
   discord_uid String
   api_key String
   username String
 }
 
 model feedrecord {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  amount Int
-  date   DateTime @db.Date
+  id     Int   @id @default(autoincrement())
+  name String @default("")
+  amount Float
+  rarity String @default("")
+  date   DateTime
   uid    String
 }
 
 model users {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id   String @id @default(uuid())
   name String
   uid  String
   powerup String[]
@@ -30,7 +32,7 @@ model users {
 }
 
 model userstate {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id   String @id @default(uuid()) 
   actionPoint Int
   uid String
   physical Int
@@ -40,7 +42,7 @@ model userstate {
 }
 
 model Playlist {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id   String @id @default(uuid())
   userId      String
   guildId     String
   tracks      Json

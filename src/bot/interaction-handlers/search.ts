@@ -16,7 +16,7 @@ import { LavalinkResponse, LoadType, Track } from "shoukaku";
 import { fancyTimeFormat } from "../../lib/utils";
 
 export class SearchInteractionHandler extends InteractionHandler {
-    public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
+    public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
         super(ctx, {
             ...options,
             interactionHandlerType: InteractionHandlerTypes.Button,

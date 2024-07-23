@@ -1,25 +1,13 @@
-import {
-    InteractionHandler,
-    InteractionHandlerTypes,
-    PieceContext,
-} from "@sapphire/framework";
-import {
-    EmbedBuilder,
-    type ButtonInteraction,
-    ActionRowBuilder,
-    ButtonBuilder,
-} from "discord.js";
+import { InteractionHandler, InteractionHandlerTypes, PieceContext } from "@sapphire/framework";
+import { EmbedBuilder, type ButtonInteraction, ActionRowBuilder, ButtonBuilder } from "discord.js";
 import prisma from "../../lib/prisma";
 import { events } from "../../lib/seikatsu/Events";
 import { TimeSection, printTimeSection } from "../../lib/seikatsu/Schedule";
-import {
-    stateMachineDataFromUserState,
-    transitionState,
-} from "../../lib/seikatsu/Engine";
+import { stateMachineDataFromUserState, transitionState } from "../../lib/seikatsu/Engine";
 import { timeoutSet } from "../../lib/timeout";
 
 export class SeikatsuInteractionHandler extends InteractionHandler {
-    public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
+    public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
         super(ctx, {
             ...options,
             interactionHandlerType: InteractionHandlerTypes.Button,
@@ -28,11 +16,8 @@ export class SeikatsuInteractionHandler extends InteractionHandler {
 
     public override async parse(interaction: ButtonInteraction) {
         if (interaction.customId.startsWith("seikatsu")) {
-            const [interactionType, timeSection, actionName, author] =
-                interaction.customId.split("#");
-            console.log(
-                `Received interaction from ${interaction.user.id} for interaction with author ${author}`
-            );
+            const [interactionType, timeSection, actionName, author] = interaction.customId.split("#");
+            console.log(`Received interaction from ${interaction.user.id} for interaction with author ${author}`);
 
             return this.some({
                 id: interaction.customId,
@@ -46,10 +31,7 @@ export class SeikatsuInteractionHandler extends InteractionHandler {
         }
     }
 
-    public override async run(
-        interaction: ButtonInteraction,
-        parsedData: InteractionHandler.ParseResult<this>
-    ) {
+    public override async run(interaction: ButtonInteraction, parsedData: InteractionHandler.ParseResult<this>) {
         // console.log(parsedData);
         if (!parsedData) {
             console.log("unimplemented interaction");
@@ -89,9 +71,7 @@ export class SeikatsuInteractionHandler extends InteractionHandler {
         else if (parsedData.section === "noon") section = TimeSection.NOON;
         else if (parsedData.section === "night") section = TimeSection.NIGHT;
         else section = TimeSection.SLEEP;
-        const action = events[section].find(
-            (x) => x.name === parsedData.action
-        );
+        const action = events[section].find((x) => x.name === parsedData.action);
         if (!action) {
             await interaction.reply({
                 content: "Invalid state. Aborting...",
@@ -159,9 +139,7 @@ export class SeikatsuInteractionHandler extends InteractionHandler {
                 actionRow.addComponents(
                     new ButtonBuilder()
                         .setLabel(`${action.name} - ${action.actionPoint}`)
-                        .setCustomId(
-                            `seikatsu#${section}#${action.name}#${interaction.user.id}`
-                        )
+                        .setCustomId(`seikatsu#${section}#${action.name}#${interaction.user.id}`)
                         .setStyle(1)
                 );
             });
