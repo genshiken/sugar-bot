@@ -46,7 +46,9 @@ export class FeedCommand extends Command {
                 msg += `${i + 1}. ${Formatters.userMention(item.uid)} - ${item._sum.amount}\n`;
                 i++;
             }
-            embed.setDescription(msg);
+            if (config.grafanaHost) {
+                embed.setDescription(Formatters.hyperlink("Cool Dashboard Here!", `${config.grafanaHost}/public-dashboards/b256248adc5f4990a8f938604b29d4fc`));
+            }
             await message.channel.send({ embeds: [embed] });
             return;
         }

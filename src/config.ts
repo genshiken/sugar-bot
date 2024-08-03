@@ -24,6 +24,7 @@ export const config = {
     botPrefix: process.env["NODE_ENV"] === "development" ? new RegExp("^sdev[,! ]", "i") : new RegExp("^sugar[,! ]", "i"),
     music: process.env["MUSIC"] === "false" ? false : true, // by default will enable music feature
     lavalinkConfigPath: process.env["MUSIC"] === "false" ? "" : getEnv("LAVALINK_CONFIG_PATH"),
+    grafanaHost: process.env["GRAFANA_HOST"] || null,
 };
 
 if (process.env["NODE_ENV"] === "development") {
