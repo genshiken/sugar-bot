@@ -125,7 +125,7 @@ export class FeedCommand extends Command {
             where: {
                 uid: message.author.id,
                 date: {
-                    gt: sub(new Date(), { hours: 3 }),
+                    gt: sub(new Date(), { hours: 2 }),
                 },
             },
         });

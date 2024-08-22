@@ -101,8 +101,8 @@ const UltraRareBin: GachaBin = {
     ],
 };
 
-const LegendaryRare: GachaBin = {
-    category: "legendary rare",
+const MiscBin: GachaBin = {
+    category: "misc",
     items: [
         {
             name: "Golden Whiskas",
@@ -112,8 +112,8 @@ const LegendaryRare: GachaBin = {
     ],
 };
 
-const MiscBin: GachaBin = {
-    category: "misc",
+const LegendaryRare: GachaBin = {
+    category: "legendary rare",
     items: [
         {
             name: "Cucumber",
