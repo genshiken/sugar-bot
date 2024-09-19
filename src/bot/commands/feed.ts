@@ -129,33 +129,6 @@ export class FeedCommand extends Command {
                 },
             },
         });
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date();
-        endOfDay.setHours(23, 59, 59, 999);
-
-        const recordOfTodayFeed = await prisma.feedrecord.findMany({
-            where: {
-                uid: message.author.id,
-                date: {
-                    gte: startOfDay,
-                    lte: endOfDay,
-                },
-            },
-        });
-        if (recordOfTodayFeed.length == 4) {
-            await prisma.users.updateMany({
-                where: {
-                    uid: message.author.id,
-                },
-                data: {
-                    powerup: {
-                        push: "kratingdaeng",
-                    },
-                },
-            });
-            await message.channel.send("You've feed me 4 times today, nyaa. Have a kratingdaeng to keep you awake, nyaw...");
-        }
         if (user.active_powerup === "kratingdaeng") {
             // use kratingdaeng, update active to empty
             await prisma.users.updateMany({
@@ -193,6 +166,33 @@ export class FeedCommand extends Command {
                 date: new Date(),
             },
         });
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const recordOfTodayFeed = await prisma.feedrecord.findMany({
+            where: {
+                uid: message.author.id,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+        });
+        if (recordOfTodayFeed.length == 4) {
+            await prisma.users.updateMany({
+                where: {
+                    uid: message.author.id,
+                },
+                data: {
+                    powerup: {
+                        push: "kratingdaeng",
+                    },
+                },
+            });
+            await message.channel.send("You've feed me 4 times today, nyaa. Have a kratingdaeng to keep you awake, nyaw...");
+        }
         if (gacha.name === "Kratingd**ng") {
             await prisma.users.updateMany({
                 where: {
