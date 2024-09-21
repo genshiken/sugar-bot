@@ -87,6 +87,7 @@ export class GachaCommand extends Command {
             },
             data: {
                 powerup: remainingPowerup,
+                active_powerup: "kratingdaeng",
             },
         });
         const embed = new EmbedBuilder();
