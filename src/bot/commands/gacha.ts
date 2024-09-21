@@ -17,8 +17,8 @@ export class GachaCommand extends Command {
     }
 
     public override async messageRun(message: Message, args: Args) {
-        let amount = await args.pick("number").catch(() => 1);
-        amount = Math.max(1, Math.min(amount, 10));
+        let amount = await args.pick("integer").catch(() => 1);
+        amount = Math.floor(Math.max(1, Math.min(amount, 10)));
         const isRequestingInfo = args.getFlags("i");
 
         if (isRequestingInfo) {

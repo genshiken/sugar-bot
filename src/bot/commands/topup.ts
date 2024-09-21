@@ -37,6 +37,6 @@ export class TopUpCommand extends Command {
                 powerup: remainingPowerup,
             },
         });
-        await message.reply("You've successfully topped up 100 Kratingd*eng!");
+        await message.reply("You've successfully topped up 10 Kratingd*eng!");
     }
 }
