@@ -15,6 +15,8 @@ type GachaPool = {
     [key in GachaTier]: GachaBin;
 };
 
+export const POWERUP_KRATINGDAENG = "kratingdaeng";
+
 const NormalBin: GachaBin = {
     category: "normal",
     items: [
@@ -140,6 +142,15 @@ export const GachaRate: { [key in GachaTier]: number } = {
     normal: 1,
 };
 
+export const RateUpGachaRate: { [key in GachaTier]: number } = {
+    "legendary rare": 0.06289 / 100,
+    misc: 1.5 / 100,
+    "ultra rare": 10 / 100,
+    "super rare": 32 / 100,
+    rare: 50 / 100,
+    normal: 1,
+};
+
 export class GachaFactory {
     private pool: GachaPool;
 
@@ -154,6 +165,16 @@ export class GachaFactory {
         else if (val <= GachaRate["ultra rare"]) return this.itemGacha(this.pool["ultra rare"]);
         else if (val <= GachaRate["super rare"]) return this.itemGacha(this.pool["super rare"]);
         else if (val <= GachaRate.rare) return this.itemGacha(this.pool.rare);
+        else return this.itemGacha(this.pool.normal);
+    }
+
+    public rateupGacha(): GachaItem {
+        const val = Math.random();
+        if (val <= RateUpGachaRate["legendary rare"]) return this.itemGacha(this.pool["legendary rare"]);
+        else if (val <= RateUpGachaRate.misc) return this.itemGacha(this.pool.misc);
+        else if (val <= RateUpGachaRate["ultra rare"]) return this.itemGacha(this.pool["ultra rare"]);
+        else if (val <= RateUpGachaRate["super rare"]) return this.itemGacha(this.pool["super rare"]);
+        else if (val <= RateUpGachaRate.rare) return this.itemGacha(this.pool.rare);
         else return this.itemGacha(this.pool.normal);
     }
 

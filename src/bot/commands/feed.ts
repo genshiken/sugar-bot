@@ -3,7 +3,7 @@ import { Formatters, Message, EmbedBuilder, Embed } from "discord.js";
 import prisma from "../../lib/prisma";
 import { sub, formatDistanceToNow } from "date-fns";
 import { config } from "../../config";
-import { GachaFactory, GachaPool, GachaRate } from "../../lib/gacha";
+import { GachaFactory, GachaPool, GachaRate, POWERUP_KRATINGDAENG } from "../../lib/gacha";
 
 export class FeedCommand extends Command {
     private gachaFactory: GachaFactory;
@@ -129,7 +129,7 @@ export class FeedCommand extends Command {
                 },
             },
         });
-        if (user.active_powerup === "kratingdaeng") {
+        if (user.active_powerup === POWERUP_KRATINGDAENG) {
             // use kratingdaeng, update active to empty
             await prisma.users.updateMany({
                 where: {
@@ -187,7 +187,7 @@ export class FeedCommand extends Command {
                 },
                 data: {
                     powerup: {
-                        push: "kratingdaeng",
+                        push: POWERUP_KRATINGDAENG,
                     },
                 },
             });
@@ -200,7 +200,7 @@ export class FeedCommand extends Command {
                 },
                 data: {
                     powerup: {
-                        push: "kratingdaeng",
+                        push: POWERUP_KRATINGDAENG,
                     },
                 },
             });

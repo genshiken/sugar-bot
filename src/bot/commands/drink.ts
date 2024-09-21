@@ -19,9 +19,7 @@ export class DrinkCommand extends Command {
             },
         });
         if (!user) {
-            await message.channel.send(
-                "Ew, I don't know who you are but you're creepy\n気持ちわるい"
-            );
+            await message.channel.send("Ew, I don't know who you are but you're creepy\n気持ちわるい");
             return;
         }
         // check if has kratingdaeng
@@ -46,9 +44,7 @@ export class DrinkCommand extends Command {
             return;
         }
 
-        await message.reply(
-            `I'm not quite sure what you want me to drink. Give me something to drink I guess?`
-        );
+        await message.reply(`I'm not quite sure what you want me to drink. Give me something to drink I guess?`);
         return;
     }
 }
